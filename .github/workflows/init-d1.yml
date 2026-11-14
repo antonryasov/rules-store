@@ -22,7 +22,7 @@ jobs:
       - name: Refuse if database has user tables
         working-directory: worker
         run: |
-          npx --yes wrangler@4.162.0 d1 execute rulesstore-db --remote --json --command "SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%' AND name NOT LIKE 'd1_%'" > /tmp/rules-check.json
+          npx --yes wrangler@4.162.0 d1 execute rulesstore-db --remote --json --command "SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%' AND name NOT LIKE 'd1_%'" > /tmp/rules-check.json || { cat /tmp/rules-check.json; exit 1; }
           node -e "const r=require('/tmp/rules-check.json');if(!Array.isArray(r)||!r[0]||!Array.isArray(r[0].results)||r[0].results.length){console.error('D1 NOT EMPTY OR CHECK FAILED. STOP.');process.exit(1)}"
       - name: Initialize fresh RULES database
         working-directory: worker
