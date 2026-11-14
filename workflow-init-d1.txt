@@ -1,0 +1,29 @@
+name: RULES - initialize empty D1
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type INIT to confirm this is a NEW EMPTY RULES database'
+        required: true
+permissions:
+  contents: read
+jobs:
+  initialize:
+    if: ${{ inputs.confirmation == 'INIT' }}
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Refuse if database has user tables
+        working-directory: worker
+        run: |
+          npx --yes wrangler@4.162.0 d1 execute rulesstore-db --remote --json --command "SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%' AND name NOT LIKE 'd1_%'" > /tmp/rules-check.json
+          node -e "const r=require('/tmp/rules-check.json');if(!Array.isArray(r)||!r[0]||!Array.isArray(r[0].results)||r[0].results.length){console.error('D1 NOT EMPTY OR CHECK FAILED. STOP.');process.exit(1)}"
+      - name: Initialize fresh RULES database
+        working-directory: worker
+        run: npx --yes wrangler@4.162.0 d1 execute rulesstore-db --remote --file=../database/initialization-fresh-only.sql --yes

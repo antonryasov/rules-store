@@ -1,0 +1,18 @@
+{
+  "name": "rules-api",
+  "main": "index.mjs",
+  "compatibility_date": "2026-11-12",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rulesstore-db",
+      "database_id": "f1f0a8fe-285d-4a60-8ac8-d72d5f6f613d"
+    }
+  ],
+  "keep_vars": true,
+  "triggers": {
+    "crons": [
+      "*/5 * * * *"
+    ]
+  }
+}

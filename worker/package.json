@@ -1,0 +1,6 @@
+{
+  "name": "rules-api-locked",
+  "private": true,
+  "version": "0.0.1",
+  "devDependencies": {"wrangler": "4.162.0"}
+}
